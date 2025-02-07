@@ -1,0 +1,370 @@
+;; Widget para abrir un menú de aplicaciones 
+(defpoll arch_icon :interval "1s" "scripts/arch-menu.sh -i")
+
+(defwidget arch []
+	(box
+		:orientation "v"
+		:space-evenly "false"
+		(eventbox
+			:cursor "pointer"
+			(button
+				;; o puedes hacer q el script mande la ruta a la img:
+				;; :style "background-image: url('${arch_icon}');"
+				:style "background-image: url('scripts/images/arch.svg');"
+				:class "launcher_icon, trayicon"
+				:onclick "scripts/arch-menu.sh -l &"
+			)
+		) 
+	)
+)
+
+;; Widget para mostrar el nivel de batería
+(defpoll battery_icon :interval "1s" "scripts/battery.sh -i")
+(defpoll battery_level :interval "1s" "scripts/battery.sh -p")
+
+(defwidget battery []
+  (eventbox
+    :cursor "pointer"
+    (box
+      :orientation "vertical"
+      :spacing 10
+      (label
+        :text battery_icon
+        :tooltip "${battery_level}%"
+        :class "battery-icon"
+      )
+    )
+  )
+)
+
+
+
+;; Widget para verificar las actualizaciones de Arch Linux
+(defwidget pacman []
+	(box
+		:orientation "v"
+		:space-evenly "false"
+		(eventbox
+			:cursor "pointer"
+			(button
+				:style "background-image: url('scripts/images/pacman.png');"
+				:class "trayicon"
+				:onclick "kitty --hold --class=Updating -e $HOME/.config/eww/scripts/updates.sh --print-updates &"
+			)
+		)	
+	)	
+)
+
+;; Widget para seleccionar colores en pantalla
+(defwidget color []
+	(box
+		:orientation "v"
+		:space-evenly "false"
+		:spacing "15"
+		(eventbox
+			:cursor "pointer"
+			(button
+				:class "select-color"
+				:onclick "wl-color-picker &"
+				(label
+					:text " "
+				)
+			)
+		)
+	)
+)
+
+;; Widget para controlar el volumen
+;; sudo pacman -S wireplumber
+;; yay -S pwvucontrol
+(defvar volumen false)
+(defpoll volumen_icon :interval "1s" "scripts/volumen.sh -i")
+(defpoll volumen_value :interval "1s" "scripts/volumen.sh -v")
+
+(defwidget volumen []
+	(eventbox
+			:onhover "${EWW_CMD} update volumen=true"
+			:onhoverlost "${EWW_CMD} update volumen=false"
+			:cursor "pointer"
+		(box      
+				:orientation "v"
+				:space-evenly "false"
+				:spacing "2"
+				(revealer
+						:transition "slideup"
+						:reveal volumen
+						:duration "550ms"
+					(scale
+							:class "barra"
+							:value {volumen_value ?: "0"}
+							:onchange "wpctl set-volume @DEFAULT_AUDIO_SINK@ {}% && scripts/volumen.sh -n {}"
+							:orientation "v"
+							:flipped true
+							:tooltip "${volumen_value}%"
+							:max 101
+							:min 0
+					)
+				)
+				(button
+					:style "background-image: url('${volumen_icon}');"
+					:class "trayicon"
+					:onclick "pwvucontrol &"
+					:onrightclick "pw-volume mute toggle"
+				)
+		)
+	)
+)
+
+
+;; Widget para controlar el brillo del monitor 0
+(defvar brillo false)
+(defpoll brillo_icon :interval "1s" "scripts/brillo.sh -i")
+(defpoll brillo_value :interval "1s" "scripts/brillo.sh -b")
+
+(defwidget brillo []
+        (eventbox
+                        :onhover "${EWW_CMD} update brillo=true"
+                        :onhoverlost "${EWW_CMD} update brillo=false"
+                        :cursor "pointer"
+                (box
+                                :orientation "v"
+                                :space-evenly "false"
+                                :spacing "2"
+                                (revealer
+                                                :transition "slideup"
+                                                :reveal brillo
+                                                :duration "550ms"
+                                        (scale
+                                                        :class "barra"
+                                                        :value {brillo_value ?: "0"}
+                                                        :onchange "brightnessctl set {}% && scripts/brillo.sh -n {}"
+                                                        :orientation "v"
+                                                        :flipped true
+                                                        :tooltip "${brillo_value}%"
+                                                        :max 101
+                                                        :min 0
+                                        )
+                                )
+                                (button
+                                        :style "background-image: url('${brillo_icon}');"
+                                        :class "trayicon"
+                                )
+                )
+        )
+)
+
+
+;; Widget para controlar la conexion a un AP
+(defpoll WIFIICON :interval "5s" "scripts/internet.sh -i")
+(defpoll INTERFACE :interval "5s" "scripts/internet.sh -e")
+
+(defwidget wifi []
+	(box
+		:orientation "v"
+			(eventbox
+				:timeout "600ms" 
+				:cursor "pointer"
+					(button 
+						:style "background-image: url('${WIFIICON}');"
+						:class "trayicon"
+						:tooltip "${INTERFACE}"
+						:timeout "600ms"
+						;; & sirve para que espere a que termine el script. En este caso si no se usa solo cargará el primer menú
+						:onclick "scripts/wifi-menu.sh &"
+					)
+			)	
+	)
+)
+
+
+;; Widget para mostrar la hora
+(defwidget hora []
+	(box
+			:orientation "v"
+			:class "time"
+			:valign "end"
+	(eventbox :cursor "pointer"
+	(button	
+			:onclick "eww open calendario"
+			:onrightclick "eww close calendario"
+			:class "time-hour" "${formattime(EWW_TIME, "%H")}"))
+		(eventbox
+				:cursor "pointer"
+					(button	:onclick ""
+						:class "time-min" "${formattime(EWW_TIME, "%M")}"
+					)
+		)
+	)
+)
+
+;; Widget para controlar la selección de emojis de fuentes en el sistema
+
+
+;; Widget para apagar, reiniciar, hibernanr
+(defvar power false)
+(defwidget power []
+	(eventbox	:onhover "${EWW_CMD} update power=true"
+				:onhoverlost "${EWW_CMD} update power=false"
+				:cursor "pointer"
+
+	(box	:orientation "v"
+			:space-evenly "false"
+			:vexpand "false"
+			:class "powermenu"
+
+	(revealer	:transition "slideup"
+				:reveal power
+				:duration "550ms"
+
+	(box	:orientation "v"
+			:space-evenly "false"
+
+	(button	:style "background-image: url('scripts/images/enpass.png');"
+			:class "button-lock"
+			:tooltip "Pantalla de bloqueo"
+			:onclick "")
+
+	(button :style "background-image: url('scripts/images/sys-sleep.png');"
+			:class "button-bspres"
+			:tooltip "Suspender"
+			:onclick "systemctl suspend")
+
+	(button	:style "background-image: url('scripts/images/sys-reboot.png');"
+			:class "button-reb"
+	  		:tooltip "Reiniciar"
+			:onclick "reboot")
+
+	(button	:style "background-image: url('scripts/images/sys-poweroff.png');"
+			:class "button-off"
+			:tooltip "Apagar"
+			:onclick "shutdown now")))
+
+	(button	:style "background-image: url('scripts/images/sys-powermenu.png');"
+			:class "button-powermenu"
+			:tooltip "Menú de encendido"))))
+
+;; Widgets que contiene algunos de los widgets de arriba con el proposito de que se muestren separados en la barra
+(defwidget start []
+	(box
+                :orientation "v"
+                :valign "start"
+                :space-evenly false
+                :class "control"
+                (arch)
+		(wifi)
+		(brillo)
+		(volumen)
+		(battery)
+        )
+)
+
+
+
+(defwidget end []
+        (box
+                :orientation "v"
+		:valign "end"
+                :space-evenly false
+                :class "control"
+		(pacman)
+		(color)
+		(hora)
+		(power)
+        )
+)
+
+
+;; Widget que contiene a su vez el widget que contiene los widgets de ajustes del sistema de arriba
+;; Esto para hacer que esta barra sea más ancha y contenga una barra más delgada, dando la impresión de un contorno en una única barra de estado
+(defwidget bar []
+	(box
+		:orientation "v"
+		:class "eww_bar"
+		:vexpand "false"
+		:hexpand "false"
+		(start)
+		(end)
+	)
+)
+
+(defwindow bar
+        :monitor 1
+        :geometry
+                (
+                geometry
+		:x "7px"
+                :y "0%"
+                :width "50px"
+                :height "30%"
+                :anchor "center right"
+                )
+        :stacking "overlay"
+        :exclusive "true"
+        (bar)
+)
+
+
+;; Widget de calendario
+(defpoll date :interval "1s" "date '+%d %b, %I:%M %p'")
+(defpoll completeday :interval "1h" "date '+%A, %d %B'")
+
+(defpoll lithour :interval "30m" "date +%H")
+(defpoll litmin :interval "30s" "date +%M")
+
+(defpoll calendar_day :interval "10h" "date '+%d'")
+(defpoll calendar_month :interval "10h" "date '+%m'")
+(defpoll calendar_year :interval "10h" "date '+%Y'")
+
+(defwidget divider []
+  (box :class "divider"
+       :orientation "v"
+       :space-evenly true)
+)
+
+(defwidget time []
+  (box :class "timebox" :orientation "v" :space-evenly false
+    (box :class "time-container" :orientation "h" :space-evenly false :halign "center" :valign "center"
+      (label :class "content" :text "${lithour}")
+    (divider)
+      (label :class "content" :text "${litmin}"))
+
+    (box :class "date-container" :orientation "h" :space-evenly true :halign "center"
+      (label :text "${completeday}"))
+))
+
+(defwidget cal []
+  (box :class "cal-box"
+       :orientation "v"
+       :space-evenly false
+    (calendar :class "cal"
+              :day {calendar_day ?: "1"}
+              :month {calendar_month ?: "1"}
+              :year {calendar_year ?: "2023"}
+    )
+  )
+)
+
+(defwidget date []
+  (box :class "date"
+       :orientation "v"
+       :space-evenly false
+    (time)
+    (cal)
+  )
+)
+
+(defwindow calendario
+  	:monitor 1
+	:geometry 
+		(
+		geometry 
+		:x "0px" 
+		:y "8%" 
+		:anchor "center"
+		)
+	:stacking "fg"
+	:exclusive "true"
+	(date)
+)
+
+
