@@ -1,1 +1,1 @@
-# wayfire-dotfiles
+# He usado wayfire y Hyprland
