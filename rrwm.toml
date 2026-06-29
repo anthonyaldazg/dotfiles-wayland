@@ -1,0 +1,194 @@
+[input.keyboard] # Note: This configuration option requires logging out and back in, or restarting, to take effect.
+layout = "us"
+variant = "intl" # EL valor por defecto es qwerty
+options = "" # Supports multiple options, separated by commas
+model = "pc105" # Default is pc105
+numlock = "true" # Default is off
+
+[output.HDMI-A-1] # You can use wlr-randr to get hardware information of connected monitors
+focus_at_startup = "true" # Focus this monitor by default on startup. Ensure only one monitor has this option set, otherwise initial focus may be random.
+mode = "1920x1080@60.000" # Format: "<width>x<height>" or "<width>x<height>@<refresh rate>". If refresh rate is omitted, the highest available is chosen by default.
+scale = "1" # Adjust scale using integers or fractions, e.g., "1.25".
+transform = "normal" # Rotate display. Valid values: normal, 90, 180, 270, flipped, flipped-90, flipped-180, and flipped-270.
+position={ x="1920", y="0" } # Position of the output in the coordinate space of all monitors. Monitors without an explicit position default to position={ x="0", y="0" }, creating a mirroring effect.
+# Note: The width (or height) here must be the logical width (physical pixels / scale factor). For example, a 4K screen (3840 wide) with 2x scaling occupies only 1920 units in the layout space.
+
+[output.eDP-1]
+mode = "1920x1080@60.000"
+scale = "1"
+transform = "normal"
+position={ x="0", y="0" }
+
+[waybar]  # Icons and styles for waybar tags, defaults to Arabic numerals
+tag_icons = ["", "", "", "", "󰃽", "󰊢", "", "󰙯", "", "󰐋", "󰕼", "󰎈", "󰎄", "", "", "", "󰊴", "", "", "󰆍", "", "", "", "", "", "󰘦", "", "󰗨", "", "", "", "", ""]
+focused_style = "<span color='#bd93f9'>"
+occupied_style = "<span color='#6C7086'>"
+empty_style = "<span color='#313244'>"
+
+[animations]
+enable = "true" # Animation enabled by default
+duration = "150" # Animation transition time
+
+[window]
+smart_borders = "true" # Borders/gaps disappear when only one window is present
+gaps = "5" # Window gaps
+
+[window.active] # Set border for the focused window; width should not exceed the gaps defined in [window]
+border = { width = "3", color = "#bd93f9", resize_color = "#ff5555" }
+
+[window.rule] # You can use 'rrwm --appid' List all active windows with their appid and title
+match = [
+	{ appid="chromium", icon="", width="27%" }, # Split tiled window width/height by ratio, units in % or px
+	{ appid="scrcpy", icon="", width="34.31%", height="100%", floating="true" },
+	{ appid="zen-browser", icon="" },
+	{ appid="zen-browser", title="Peek*", icon="", width="27%" }, # Allow regular matching via title
+	{ appid="kitty", icon="󰆍" },
+	{ appid="neovide", icon="" },
+	{ appid="wechat", icon="" },
+	{ appid="lanchat", icon="" },
+	{ appid="mpv", icon="󰐋", fullscreen="true", floating="true" },
+	{ appid="com.obsproject.Studio", icon="󰃽" },
+	{ appid="com.mitchellh.ghostty", icon="" },
+	{ appid="org.wezfurlong.wezterm", icon="" },
+	{ appid="com.gabm.satty", icon="", fullscreen="true" },
+	{ appid="kiro", icon="" }
+]
+
+
+# You can use 'wev' to query the XKB names for specific keys
+[keybindings.super]
+minus = { action = "toggle_minimize_restore" }
+equal = { action = "toggle_minimize_restore" }
+r = { action = "toggle_resize_mode" }
+# Alternar el enfoque entre ventanas flotantes y ventanas en mosaico
+space = { action = "switch_focus_between_floating_and_tiling" }
+# Cerrar la ventana actualmente enfocada
+q = { action = "close_focused" }
+# Toggle fullscreen
+f = { action = "toggle_fullscreen" }
+# Switch focus between different tags
+1 = { action = "focus", args = ["1"] }
+2 = { action = "focus", args = ["2"] }
+3 = { action = "focus", args = ["3"] }
+4 = { action = "focus", args = ["4"] }
+5 = { action = "focus", args = ["5"] }
+6 = { action = "focus", args = ["6"] }
+7 = { action = "focus", args = ["7"] }
+8 = { action = "focus", args = ["8"] }
+9 = { action = "focus", args = ["9"] }
+0 = { action = "focus", args = ["10"] }
+# Switch focus Up/Down/Left/Right, automatically crossing tag boundaries
+Left = { action = "focus", args = ["left"] }
+Right = { action = "focus", args = ["right"] }
+Up = { action = "focus", args = ["up"] }
+Down = { action = "focus", args = ["down"] }
+# Launch software
+Return = { action = "spawn", args = ["kitty"] }
+x = { action="spawn", args=["zen"] }
+j = { action="shell", cmd='/usr/bin/grim -t ppm - | /usr/bin/satty --filename - --fullscreen' }
+a = { action="spawn", args=["/usr/bin/fuzzel", "toggle"] }
+k = [
+	{ action="shell", cmd='showkeys' },
+	{ action="shell", cmd='systemctl --user stop notify-reg' },
+]
+
+# Allow different modifiers
+[keybindings.alt]
+Return = { action = "spawn", args = ["ghostty"] }
+
+# Multi-modifier example: super + Shift
+[keybindings.super_shift]
+# Toggle the currently focused window between floating/tiling states
+space = { action = "toggle_window_floating" }
+# Overload configuration
+c = { action = "reload_configuration" }
+# Exit the current river.
+q = [
+	{ action="spawn", args=["pkill", "fcitx5"] },
+	{ action="shell", cmd="fuser -k ${XDG_RUNTIME_DIR}/${WAYLAND_DISPLAY}" }
+]
+
+# Move window across tags
+1 = { action = "move", args = ["1"] }
+2 = { action = "move", args = ["2"] }
+3 = { action = "move", args = ["3"] }
+4 = { action = "move", args = ["4"] }
+5 = { action = "move", args = ["5"] }
+6 = { action = "move", args = ["6"] }
+7 = { action = "move", args = ["7"] }
+8 = { action = "move", args = ["8"] }
+9 = { action = "move", args = ["9"] }
+0 = { action = "move", args = ["10"] }
+# Move window Up/Down/Left/Right, automatically crossing tag boundaries
+n = { action = "move", args = ["left"] }
+i = { action = "move", args = ["right"] }
+u = { action = "move", args = ["up"] }
+e = { action = "move", args = ["down"] }
+j = { action="shell", cmd='/usr/bin/grim -g "$(/usr/bin/slurp < /dev/null)" - | /usr/bin/satty --filename -' }
+Return = { action = "spawn", args = ["neovide", "--frame", "none"] }
+k = [
+	{ action = "spawn", args = ["pkill", "showkeys"] },
+	{ action="shell", cmd='systemctl --user start notify-reg' },
+]
+
+# Use quotes if you want to use a plus sign for multiple modifiers
+[keybindings."alt+shift"]
+space = { action = "spawn", args = ["wezterm"] }
+
+# Keys without modifiers
+[keybindings]
+F1 = { action = "shell", cmd = "pactl set-sink-volume @DEFAULT_SINK@ -5%" }
+[keybindings.none] # This has the same effect as [keybindings]
+F2 = { action = "shell", cmd = "pactl set-sink-volume @DEFAULT_SINK@ +5%" }
+# Volume control, 'wpctl' is included with wireplumber
+XF86AudioRaiseVolume = { action = "shell", cmd = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+" }
+XF86AudioLowerVolume = { action = "shell", cmd = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1-" }
+XF86AudioMute        = { action = "shell", cmd = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle" }
+XF86AudioMicMute     = { action = "shell", cmd = "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle" }
+# Brightness control
+XF86MonBrightnessUp   = { action = "spawn", args = ["brightnessctl", "--class=backlight", "set", "+10%"] }
+XF86MonBrightnessDown = { action = "spawn", args = ["brightnessctl", "--class=backlight", "set", "10%-"] }
+
+# Switch focus between multiple monitors
+[keybindings.super_ctrl]
+Up = { action = "focus", args = ["up_output"] }
+Down = { action = "focus", args = ["down_output"] }
+Left = { action = "focus", args = ["left_output"] }
+Right = { action = "focus", args = ["right_output"] }
+
+# Move windows between multiple monitors
+[keybindings.super_ctrl_shift]
+Up = { action = "move", args = ["up_output"] }
+Down = { action = "move", args = ["down_output"] }
+Left = { action = "move", args = ["left_output"] }
+Right = { action = "move", args = ["right_output"] }
+
+[resize] # Acitons such as "shrink_width" can also be used in ordinary shortcut keys. The resize mode elegantly isolates two sets of shortcut keys.
+# Adjust window size, unit 10px
+Right = { action = "shrink_width", unit = "10" }
+Down = { action = "grow_height", unit = "10" }
+Up = { action = "shrink_height", unit = "10" }
+Left = { action = "grow_width", unit = "10" }
+Return = { action = "exit_resize_mode" }
+Escape = { action = "exit_resize_mode" }
+
+[resize.super]
+r = { action = "exit_resize_mode" } # The effect here is the same as "toggle_resize_mode".
+
+[resize.shift]
+# Combined shortcut shift+n/e/i/u for minor window size adjustments
+Right = { action = "shrink_width", unit = "20"}
+Down = { action = "grow_height", unit = "20"}
+Up = { action = "shrink_height", unit = "20"}
+Left = { action = "grow_width", unit = "20"}
+
+[resize.super_shift] # When unit is carried, the function becomes moving by pixels.
+# Combined shortcut super+shift+n/e/i/u to move window coordinates, unit 5px
+n = { action = "move", args = ["left"], unit = "5" }
+i = { action = "move", args = ["right"], unit = "5" }
+u = { action = "move", args = ["up"], unit = "5" }
+e = { action = "move", args = ["down"], unit = "5" }
+
+[pointer.super] # You can use 'libinput events' to query standard names for mouse buttons
+BTN_LEFT = { action = "move_interactive" } # Move by holding Alt + Left Click anywhere on the window
+BTN_RIGHT = { action = "resize_interactive" } # Resize by holding Alt + Right Click anywhere on the window
